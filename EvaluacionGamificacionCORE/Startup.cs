@@ -30,6 +30,7 @@ namespace EvaluacionGamificacionCORE
             services.AddScoped(typeof(IRepositoryBase<>), typeof(RepositoryBase<>));
             services.AddScoped<IPerfil, PerfilDAL>();
             services.AddScoped<ITipoMascota, TipoMascotaDAL>();
+            services.AddScoped<IPuntuacion, PuntuacionDAL>();
             services.AddControllersWithViews();
         }
 

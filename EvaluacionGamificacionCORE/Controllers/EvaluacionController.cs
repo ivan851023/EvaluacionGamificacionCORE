@@ -17,10 +17,11 @@ namespace EvaluacionGamificacionCORE.Controllers
         private IConfiguration _configuration;
         private EvaluacionContext Context { get; }
 
-        public EvaluacionController(IConfiguration configuration, IPerfil iperfil, ITipoMascota itipomascota)
+        public EvaluacionController(IConfiguration configuration, IPerfil iperfil, ITipoMascota itipomascota, IPuntuacion ipuntuacion)
         {
             _perfil = iperfil;
             _tipomascota = itipomascota;
+            _puntuacion = ipuntuacion;
             _configuration = configuration;
 
         }
@@ -28,6 +29,8 @@ namespace EvaluacionGamificacionCORE.Controllers
         private readonly IPerfil _perfil;
 
         private readonly ITipoMascota _tipomascota;
+
+        private readonly IPuntuacion _puntuacion;
 
         [HttpGet]
         public IActionResult Index()
@@ -65,7 +68,24 @@ namespace EvaluacionGamificacionCORE.Controllers
 
         public IActionResult Guardar([FromBody]EvaluacionModel model)
         {
-            return View();
+            try
+            {
+                Puntuacion table = new Puntuacion();
+                table.IdPerfil = model.SelectValuePerfil;
+                table.IdTipoMascota = model.SelectValueTipoMascota;
+                table.NumeroDocumento = model.NumeroDocumento;
+                table.FechaCreacion = DateTime.Now;
+                table.Puntaje = model.Puntaje;
+                _puntuacion.Insert(table);
+                
+                return View();
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            
         }
 
     }

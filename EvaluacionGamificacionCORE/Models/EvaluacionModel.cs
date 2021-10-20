@@ -19,13 +19,17 @@ namespace EvaluacionGamificacionCORE.Models
 
         }
 
-        public long? SelectValuePerfil { get; set; }
+        public int SelectValuePerfil { get; set; }
 
         public IEnumerable<SelectListItem> lstPerfiles { get; set; }
 
-        public long? SelectValueTipoMascota { get; set; }
+        public int SelectValueTipoMascota { get; set; }
 
         public IEnumerable<SelectListItem> lstTipoMascota { get; set; }
+
+        public string NumeroDocumento { get; set; }
+
+        public long Puntaje { get; set; }
 
     }
 }

@@ -346,7 +346,7 @@
     <div class="wrapper">
         <div class="quiz-box">
             <div class="name-box">
-                <span>GameTag</span>
+                <span>Número Documento</span>
                 
                 <form id="name-form">
                     <input type="text" id="name-input-box" class="form-control" />
@@ -428,7 +428,9 @@
 
 
 
-    }];
+        }];
+    var score = 0;
+    var percentage = 0;
 
     function changeColor() {
         myColor = colors[Math.floor(Math.random() * colors.length)];
@@ -514,7 +516,7 @@
             
             changeColor();
             // Determine how many questions the user got right
-            var score = 0;
+            
             var response = false;
             var values = [];
             var id = 0;
@@ -543,14 +545,15 @@
 
                 
             }
+            // Display the score with the appropriate message
+            percentage = (score / self.questions.length);
 
             Guardar(values);
 
             
-            // Display the score with the appropriate message
-            var percentage = (score / self.questions.length);
+            
 
-            var scoremessage = score + " de" + self.questions.length + " respuestas son correctas.";
+            var scoremessage = score + " de " + self.questions.length + " respuestas son correctas.";
             var icon = '';
             var chartcolor = '';
             console.log(percentage);
@@ -754,14 +757,15 @@
 
     function Guardar(values)
     {
-       (async () => {
+        
+        (async () => {
                     const rawResponse = await fetch('@Url.Action("Guardar", "Evaluacion")', {
                         method: 'POST',
                         headers: {
                             'Accept': 'application/json',
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify({ SelectValuePerfil: $("#ddlPerfil").val(), SelectValueTipoMascota: $("#ddlTipoMascota").val(), lstRespuestas : values})
+                        body: JSON.stringify({ SelectValuePerfil: $("#ddlPerfil").val(), SelectValueTipoMascota: $("#ddlTipoMascota").val(), lstRespuestas: values, NumeroDocumento: username, Puntaje: percentage * 100})
                     });
                     const content = await rawResponse.json();
 
