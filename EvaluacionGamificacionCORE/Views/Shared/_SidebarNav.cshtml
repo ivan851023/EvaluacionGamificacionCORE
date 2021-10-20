@@ -1,0 +1,38 @@
+﻿<!-- *SIDEBAR-NAV* -->
+<nav class="sidebar-nav">
+    <ul class="nav">
+
+        <li class="nav-title">
+            Menú
+        </li>
+        <li class="nav-item nav-dropdown">
+            <a class="nav-link nav-dropdown-toggle" href="#"><i class="icon-puzzle"></i>Gamificación </a>
+            <ul class="nav-dropdown-items">
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("Index","Evaluacion")"><i class="icon-puzzle"></i> Realizar Evaluación</a>
+                </li>
+            </ul>
+        </li>
+
+        <li class="nav-item nav-dropdown">
+            <a class="nav-link nav-dropdown-toggle" href="#"><i class="icon-badge"></i>Reportes </a>
+            <ul class="nav-dropdown-items">
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="CoreUI" asp-action="Index" asp-route-view="components-buttons"><i class="icon-badge"></i> Reporte Evaluados</a>
+                </li>
+
+            </ul>
+        </li>
+
+        <li class="nav-item nav-dropdown">
+            <a class="nav-link nav-dropdown-toggle" href="#"><i class="icon-bell"></i>Certificados </a>
+            <ul class="nav-dropdown-items">
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="CoreUI" asp-action="Index" asp-route-view="components-buttons"><i class="icon-bell"></i> Descargar Certificados</a>
+                </li>
+
+            </ul>
+        </li>
+    </ul>    
+</nav>
+<!-- /*SIDEBAR-NAV* -->

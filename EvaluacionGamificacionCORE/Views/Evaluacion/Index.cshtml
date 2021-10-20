@@ -1,0 +1,794 @@
+﻿@model EvaluacionModel
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<style>
+
+    html {
+        text-rendering: optimizeLegibility !important;
+        -webkit-font-smoothing: antialiased !important;
+    }
+
+
+
+    .wrapper {
+        height: 350px;
+        width: 700px;
+        margin: 40px auto;
+    }
+
+    .quiz-box {
+        height: 100%;
+        border: 3px solid rgba(255, 255, 255, 1);
+        background-color: #000;
+        border-radius: 0px 10%;
+        box-shadow: 0px 0px 13px 2px rgb(0, 0, 0);
+    }
+
+    .navigation-buttons {
+        text-align: center;
+        padding: 10px 0px;
+        float: right;
+    }
+
+    .name-box {
+        text-align: center;
+        padding: 10%;
+        height: 100%;
+    }
+
+        .name-box span {
+            font-weight: 500;
+            font-size: 3em;
+        }
+
+
+    .perfil-box {
+        text-align: center;
+        padding: 10%;
+        height: 100%;
+    }
+
+        .perfil-box span {
+            font-weight: 500;
+            font-size: 3em;
+        }
+
+    .mascota-box {
+        text-align: center;
+        padding: 10%;
+        height: 100%;
+    }
+
+        .mascota-box span {
+            font-weight: 500;
+            font-size: 3em;
+        }
+
+    #name-input-box {
+        height: 45px;
+        padding: 0;
+        margin-top: 20px;
+        font: 400 3rem 'Roboto Slab';
+        letter-spacing: 0.025em;
+        border: none;
+        text-align: center;
+        outline: none;
+        border-bottom: solid thin rgba(238, 238, 238, 0.12);
+    }
+
+    button {
+        border: none;
+        width: 100px;
+        height: 30px;
+        text-align: center;
+        border-radius: 0px 10px;
+        outline: none;
+    }
+
+        button:hover {
+            cursor: pointer;
+            border: 2px solid #fff;
+            border-radius: 0px 10px;
+        }
+
+        button:disabled {
+            display: none;
+        }
+
+    #name-submit-button {
+        margin-top: 30px;
+    }
+
+    .quiz {
+        height: 100%;
+        padding: 10px;
+    }
+
+    #question h2 {
+        font-weight: 600;
+        padding: 20px;
+    }
+
+    .options {
+        height: 70%;
+        height: 100%;
+        padding-left: 20px;
+    }
+
+        .options label {
+            width: 49%;
+        }
+
+
+    /* Radio Button*/
+
+    -webkit-keyframes click-wave {
+    
+        height: 40px;
+        width: 40px;
+        opacity: 0.35;
+        position: relative;
+        outline: none;
+    }
+
+
+    -moz-keyframes click-wave {
+    
+        height: 40px;
+        width: 40px;
+        opacity: 0.35;
+        position: relative;
+        outline: none;
+    }
+       
+
+    keyframes click-wave {
+      
+        height: 40px;
+        width: 40px;
+        opacity: 0.35;
+        position: relative;
+        outline: none;
+    }
+
+  
+    .option-input {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        -ms-appearance: none;
+        -o-appearance: none;
+        appearance: none;
+        position: relative;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        height: 40px;
+        width: 40px;
+        top: 13px;
+        -webkit-transition: all 0.15s ease-out 0s;
+        -moz-transition: all 0.15s ease-out 0s;
+        transition: all 0.15s ease-out 0s;
+        border: none;
+        color: #fff;
+        cursor: pointer;
+        display: inline-block;
+        margin-right: 0.5rem;
+        outline: none;
+        position: relative;
+        z-index: 1000;
+    }
+
+        .option-input:hover {
+            background: #9faab7;
+            outline: none;
+        }
+
+        .option-input:checked {
+            background: black;
+        }
+
+            .option-input:checked::before {
+                height: 40px;
+                width: 40px;
+                position: absolute;
+                content: '\2713';
+                display: inline-block;
+                font-size: 26.66667px;
+                text-align: center;
+                line-height: 40px;
+            }
+
+            .option-input:checked::after {
+                -webkit-animation: click-wave 0.65s;
+                -moz-animation: click-wave 0.65s;
+                animation: click-wave 0.65s;
+                background: white;
+                content: '';
+                display: block;
+                position: relative;
+                z-index: 100;
+            }
+
+        .option-input.radio {
+            border-radius: 50%;
+            outline: none !important;
+            margin-right: 10px;
+            border: 2px solid #fff;
+        }
+
+            .option-input.radio::after {
+                border-radius: 50%;
+                outline: none;
+            }
+
+    label {
+        display: inline-block;
+        width: 50%;
+        float: left;
+        padding-left: 20px;
+        font-weight: 500;
+        font-size: 1.3em;
+    }
+
+    /*Pie chart style starts*/
+
+
+    .score-detail, .chart {
+        display: inline-block;
+        width: 49%;
+        text-align: center;
+        vertical-align: top;
+        margin-top: 10px;
+    }
+
+
+    .easyPieChart {
+        position: relative;
+        text-align: center;
+    }
+
+        .easyPieChart canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+    .percentage,
+    .label {
+        margin-bottom: 0.5em;
+        text-align: center;
+        font-weight: 100;
+    }
+
+    .percentage {
+        font-size: 17px;
+    }
+
+    sup {
+        top: -0.2em;
+        margin-left: 1px;
+    }
+
+    .ctrl {
+        position: absolute;
+        right: 10px;
+        top: 5px;
+        color: #c4cdcc;
+        word-spacing: 5px;
+    }
+
+    /*Pie chart style ends*/
+
+    #result {
+        padding: 10px;
+        height: 100%;
+    }
+
+        #result .score-label h1 {
+            font-weight: 600;
+        }
+
+            #result .score-label h1 i {
+                margin-left: 10px;
+            }
+
+        #result .score-label h1, #result .message {
+            text-align: center;
+        }
+
+        #result .score-detail h3 {
+            margin-top: 19px;
+            padding-left: 15px;
+        }
+
+    #result-stats {
+        padding: 20px;
+    }
+
+    table, td, th {
+        padding: 10px;
+    }
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+        table td .grey {
+            color: rgba(255, 255, 255, 0.47);
+        }
+
+    th {
+        text-align: left;
+        font-size: 1.2em;
+    }
+
+    #result-stats .fa {
+        margin-right: 5px;
+    }
+
+    #result-stats .fa-check-circle {
+        color: #06ff00;
+    }
+
+    #result-stats .fa-times-circle {
+        color: #ff3d00;
+    }
+</style>
+
+
+
+<div class="quiz-box-container">
+    <div class="wrapper">
+        <div class="quiz-box">
+            <div class="name-box">
+                <span>GameTag</span>
+                
+                <form id="name-form">
+                    <input type="text" id="name-input-box" class="form-control" />
+                    
+                    <button type="submit" id="name-submit-button">Submit</button>
+                </form>
+            </div>
+            <div class="perfil-box">
+                <span>Perfil</span>
+                <div style="white-space:pre"></div>
+                <form id="perfil-form">
+                    @Html.DropDownListFor(x => x.SelectValuePerfil, Model.lstPerfiles, "Seleccione una opción", new {@class = "form-control",@id = "ddlPerfil" })
+
+                    <button type="submit" id="name-submit-button">Submit</button>
+                </form>
+            </div>
+            <div class="mascota-box">
+                <span>Tipo Mascota</span>
+                <div style="white-space:pre"></div>
+                <form id="mascota-form">
+                    @Html.DropDownListFor(x => x.SelectValueTipoMascota, Model.lstTipoMascota, "Seleccione una opción", new { @class = "form-control", @id = "ddlTipoMascota" })
+                    <button type="submit" id="name-submit-button">Submit</button>
+                </form>
+            </div>
+            <div id="question-box">
+            </div>
+            <div id="result">
+                <div class="score-label">
+                    <h1><i class="smiley"></i></h1>
+                </div>
+                <div>
+                    <div class="score-detail">
+                        <h3></h3>
+                    </div>
+                    <div class="chart">
+                        <div class="percentage" data-percent="100">
+                            <span></span><sup>%</sup>
+                        </div>
+                    </div>
+                    <h3 class="message"></h3>
+                </div>
+            </div>
+            <div id="result-stats">
+                <table>
+                    <tr>
+                        <th>Question</th>
+                        <th>You Selected</th>
+                        <th>Correct Answer</th>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="navigation-buttons">
+            <button id="nextButton">Next</button>
+            <button id="submitButton" class="btn btn-primary">Submit</button>
+            <button id="resultButton">Results</button>
+        </div>
+    </div>
+</div>
+
+<script>
+
+
+    var colors = ['#16a085', '#27ae60', '#2c3e50', '#f39c12', '#e74c3c', '#9b59b6', '#FB6964', "#472E32", "#FF4136", "#39CCCC", "#BDBB99", "#77B1A9", "#73A857"];
+    var username = '';
+    var myColor;
+    var all_questions = [{
+        question_string: "Despues de dos semanas decides cambiar la arena de tu gato",
+        choices: {
+            correct: "a",
+            wrong: ["c", "k", "m"]
+        }
+    }, {
+        question_string: "Decides dejar tu mascota con mucha agua y comida",
+        choices: {
+            correct: "b",
+            wrong: ["s", "u", "s"]
+        }
+
+
+
+    }];
+
+    function changeColor() {
+        myColor = colors[Math.floor(Math.random() * colors.length)];
+        $('body').css('background-color', myColor);
+        $('.quiz-box').css('color', '#fff');
+        //$('.option-input:checked::after').css('background', myColor);
+    };
+
+    // An object for a Quiz, which will contain Question objects.
+    var Quiz = function (quiz_name) {
+        // Private fields for an instance of a Quiz object.
+        this.quiz_name = quiz_name;
+
+        // This one will contain an array of Question objects in the order that the questions will be presented.
+        this.questions = [];
+    }
+    // A function that you can enact on an instance of a quiz object. This function is called add_question() and takes in a Question object which it will add to the questions field.
+    Quiz.prototype.add_question = function (question) {
+        // Randomly choose where to add question
+        //var index_to_add_question = Math.floor(Math.random() * this.questions.length);
+        var index_to_add_question = this.questions.length;
+        this.questions.splice(index_to_add_question--, 0, question);
+    }
+    Quiz.prototype.render = function (container) {
+
+        changeColor();
+
+        // For when we're out of scope
+        var self = this;
+
+        // Hide the quiz results modal
+        //$('#quiz-results').hide();
+
+        // Write the name of the quiz
+        //$('#quiz-name').text(this.quiz_name);
+
+        // Create a container for questions
+        var question_container = $('<div>').attr('id', 'question').appendTo(container);
+
+        // Helper function for changing the question and updating the buttons
+        function change_question() {
+
+            self.questions[current_question_index].render(question_container);
+            $('#prevButton').prop('disabled', current_question_index === 0);
+            $('#nextButton').prop('disabled', current_question_index === self.questions.length - 1);
+
+            // Determine if all questions have been answered
+            var all_questions_answered = true;
+            for (var i = 0; i < self.questions.length; i++) {
+                if (self.questions[i].user_choice_index === null) {
+                    all_questions_answered = false;
+                    break;
+                }
+            }
+            $('#submit-button').prop('disabled', !all_questions_answered);
+        }
+
+        // Render the first question
+        var current_question_index = 0;
+        change_question();
+
+        // Add listener for the previous question button
+        $('#prevButton').click(function () {
+            if (current_question_index > 0) {
+                current_question_index--;
+                change_question();
+            }
+        });
+
+        // Add listener for the next question button
+        $('#nextButton').click(function () {
+            if (current_question_index < self.questions.length - 1) {
+                current_question_index++;
+                change_question();
+                changeColor();
+            }
+        });
+
+        // Add listener for the submit answers button
+
+     
+        $('#submitButton').click(function () {
+            
+            changeColor();
+            // Determine how many questions the user got right
+            var score = 0;
+            var response = false;
+            var values = [];
+            var id = 0;
+
+            for (var i = 0; i < self.questions.length; i++) {
+
+                id++;
+               
+
+                if (self.questions[i].user_choice_index === self.questions[i].correct_choice_index) {
+                    score++;
+
+
+                    values.push({
+                        id: id,
+                        respuesta: true
+                    });
+
+                }
+                else {
+                    values.push({
+                        id: id,
+                        respuesta: false
+                    });
+                }
+
+                
+            }
+
+            Guardar(values);
+
+            
+            // Display the score with the appropriate message
+            var percentage = (score / self.questions.length);
+
+            var scoremessage = score + " de" + self.questions.length + " respuestas son correctas.";
+            var icon = '';
+            var chartcolor = '';
+            console.log(percentage);
+
+            $('.percentage').data('percent', percentage * 100);
+            $('.percentage span').text(percentage);
+
+            var message;
+            if (percentage >= .9) {
+                icon = "fa fa-smile-o";
+                message = 'Felicidades eres apto para adoptar';
+                chartcolor = "green";
+           
+            } else {
+                icon = "fa fa-meh-o";
+                message = 'Lo siento no eres apto para adoptar';
+                chartcolor = "red";
+            }
+            $('.score-label h1').html('<small>Hola </small>' + username + ', ' + 'Tu Puntaje<i class="smiley"></i>');
+            $('.message').text(message);
+            $('.score-detail h3').text(scoremessage);
+            $('.smiley').addClass(icon);
+            $('#question-box').hide();
+            $('#result').show();
+            $('.percentage').easyPieChart({
+                animate: 1000,
+                lineWidth: 4,
+                onStep: function (value) {
+                    this.$el.find('span').text(Math.round(value));
+                },
+                onStop: function (value, to) {
+                    this.$el.find('span').text(Math.round(to));
+                },
+                barColor: chartcolor
+            });
+            $('#prevButton, #nextButton, #submitButton').hide();
+            $('.navigation-buttons #resultButton').show();
+        });
+        $('#resultButton').click(function () {
+            changeColor();
+            $('#result').hide();
+            var table = $('#result-stats table').find('tbody');
+            var tr;
+            for (var i = 0; i < self.questions.length; i++) {
+                tr = $('<tr>');
+                if (self.questions[i].user_choice_index === self.questions[i].correct_choice_index) {
+                    tr.append('<td><i class="fa fa-check-circle"></i>' + self.questions[i].question_string + '</td>');
+                } else {
+                    tr.append('<td><i class="fa fa-times-circle"></i>' + self.questions[i].question_string + '</td>');
+                }
+                if (self.questions[i].choices[self.questions[i].user_choice_index] !== undefined) {
+                    tr.append('<td>' + self.questions[i].choices[self.questions[i].user_choice_index] + '</td>');
+                } else {
+                    tr.append('<td>' + '<span class="grey">No Attempt</span>' + '</td>');
+                }
+                tr.append('<td>' + self.questions[i].choices[self.questions[i].correct_choice_index] + '</td>');
+                tr.appendTo(table);
+            }
+            $('#result-stats').show();
+            $('#resultButton').hide()
+        });
+        // Add a listener on the questions container to listen for user select changes. This is for determining whether we can submit answers or not.
+        question_container.bind('user-select-change', function () {
+            var all_questions_answered = true;
+            for (var i = 0; i < self.questions.length; i++) {
+                if (self.questions[i].user_choice_index === null) {
+                    all_questions_answered = false;
+                    break;
+                }
+            }
+            $('#submit-button').prop('disabled', !all_questions_answered);
+        });
+    }
+    var Question = function (count, question_string, correct_choice, wrong_choices) {
+        this.question_string = count + ". " + question_string;
+        this.choices = [];
+        this.user_choice_index = null; // Index of the user's choice selection
+
+        // Random assign the correct choice an index
+        this.correct_choice_index = Math.floor(Math.random() * wrong_choices.length + 1);
+        var number_of_choices = wrong_choices.length + 1;
+        for (var i = 0; i < number_of_choices; i++) {
+            if (i === this.correct_choice_index)
+                this.choices[i] = correct_choice;
+            else {
+                var wrong_choice_index = Math.floor(Math.random(0, wrong_choices.length));
+                this.choices[i] = wrong_choices[wrong_choice_index];
+
+                // Remove the wrong choice from the wrong choice array so that we don't pick it again
+                wrong_choices.splice(wrong_choice_index, 1);
+            }
+        }
+    }
+    // A function that you can enact on an instance of a question object. This function is called render() and takes in a variable called the container, which is the <div> that I will render the question in. This question will "return" with the score when the question has been answered.
+    Question.prototype.render = function (container) {
+        // For when we're out of scope
+        var self = this;
+
+        // Fill out the question label
+        var question_string_h2;
+        if (container.children('h2').length === 0) {
+            question_string_h2 = $('<h2>').appendTo(container);
+        } else {
+            question_string_h2 = container.children('h2').first();
+        }
+        question_string_h2.text(this.question_string);
+
+        // Clear any radio buttons and create new ones
+        if (container.children('label').length > 0) {
+            container.children('label').each(function () {
+                var radio_button_id = $(this).attr('id');
+                $(this).remove();
+                container.children('label[for=' + radio_button_id + ']').remove();
+            });
+        }
+
+        for (var i = 0; i < this.choices.length; i++) {
+
+            // Create the label
+            var choice_label = $('<label>')
+                .attr('for', 'choices-' + i)
+                .appendTo(container);
+
+            // Create the radio button
+            var choice_radio_button = $('<input>')
+                .attr('id', 'choices-' + i)
+                .attr('type', 'radio')
+                .attr('name', 'choices')
+                .attr('value', 'choices-' + i)
+                .attr('class', 'option-input radio')
+                .attr('checked', i === this.user_choice_index)
+                .appendTo(choice_label);
+
+            choice_label.append(this.choices[i]);
+
+        }
+        // Add a listener for the radio button to change which one the user has clicked on
+        $('input[name=choices]').change(function (index) {
+            var selected_radio_button_value = $('input[name=choices]:checked').val();
+
+            // Change the user choice index
+            self.user_choice_index = parseInt(selected_radio_button_value.substr(selected_radio_button_value.length - 1, 1));
+
+            // Trigger a user-select-change
+            container.trigger('user-select-change');
+        });
+    }
+    $(document).ready(function () {
+        changeColor();
+        $('.perfil-box').hide();
+        $('.mascota-box').hide();
+        $('#name-input-box').css('border-bottom', 'solid thin ' + myColor);
+        var quiz = new Quiz('My Quiz');
+        for (var i = 0; i < all_questions.length; i++) {
+            var question = new Question((i + 1), all_questions[i].question_string, all_questions[i].choices.correct, all_questions[i].choices.wrong);
+
+            // Add the question to the instance of the Quiz object that we created previously
+            quiz.add_question(question);
+        }
+        // Render the quiz
+        var quiz_container = $('#question-box');
+        $('.navigation-buttons').hide();
+        $('#result').hide();
+        $('#result-stats').hide();
+        $('#name-form').on('submit', function (event) {
+            event.preventDefault();
+            username = $('#name-input-box').val();
+            if (username !== '' && username !== undefined) {
+                $('.name-box').hide();
+                $('.perfil-box').show();
+                $('.mascota-box').hide();
+
+            }
+        });
+
+
+
+        $('#perfil-form').on('submit', function (event) {
+            event.preventDefault();
+            username = $('#name-input-box').val();
+            if (username !== '' && username !== undefined) {
+                $('.perfil-box').hide();
+                $('.mascota-box').show();
+
+            }
+        });
+
+
+        $('#mascota-form').on('submit', function (event) {
+            event.preventDefault();
+            username = $('#name-input-box').val();
+            if (username !== '' && username !== undefined) {
+                $('.mascota-box').hide();
+                quiz.render(quiz_container);
+                $('.navigation-buttons').show();
+                $('#resultButton').hide();
+            }
+        });
+    });
+
+
+    function Guardar(values)
+    {
+       (async () => {
+                    const rawResponse = await fetch('@Url.Action("Guardar", "Evaluacion")', {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ SelectValuePerfil: $("#ddlPerfil").val(), SelectValueTipoMascota: $("#ddlTipoMascota").val(), lstRespuestas : values})
+                    });
+                    const content = await rawResponse.json();
+
+                })();
+
+    };
+
+
+
+
+    function createJSON() {
+        jsonObj = [];
+        $("input[class=email]").each(function () {
+
+            var id = $(this).attr("title");
+            var email = $(this).val();
+
+            item = {}
+            item["title"] = id;
+            item["email"] = email;
+
+            jsonObj.push(item);
+        });
+
+        console.log(jsonObj);
+    }
+
+</script>
+
+
