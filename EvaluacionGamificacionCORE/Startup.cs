@@ -31,7 +31,11 @@ namespace EvaluacionGamificacionCORE
             services.AddScoped<IPerfil, PerfilDAL>();
             services.AddScoped<ITipoMascota, TipoMascotaDAL>();
             services.AddScoped<IPuntuacion, PuntuacionDAL>();
+            services.AddScoped<IVwPuntuacion, VwPuntuacionDAL>();
             services.AddControllersWithViews();
+            services.AddMvc();
+            services.AddMvcCore();
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

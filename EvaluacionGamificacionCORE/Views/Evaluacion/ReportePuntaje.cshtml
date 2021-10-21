@@ -1,0 +1,59 @@
+﻿
+@{
+    ViewData["Title"] = "ReportePuntaje";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div id="grid"></div>
+<script>
+    $(document).ready(function () {
+        $("#grid").kendoGrid({
+            toolbar: ["excel", "pdf"],
+            excel: {
+                fileName: "ReportePuntajes.xlsx",
+                proxyURL: "@Url.Action("ExportarExcel","Evaluacion")",
+                filterable: true
+            },
+            dataSource: {
+                type: "json",
+                transport: {
+                    read: {
+                        url: "@Url.Action("LoadGridReportes", "Evaluacion")",
+                        contentType: "application/json; charset=utf-8",
+                        type: "GET"
+                    }
+
+               },
+                schema: {
+                    model: {
+                       
+                        fields: {
+                            id: { type: "number" },
+                            perfil: { type: "string" },
+                            tipoMascota: { type: "string" },
+                            numeroDocumento: { type: "string" },
+                            fechaCreacion: { type: "date" },
+                            puntaje: { type: "number" }
+                        }
+                    }
+                },
+                pageSize: 10
+            },
+            height: 550,
+            filterable: true,
+            sortable: true,
+            pageable: true,
+            columns: [
+
+                { field: "id", title: "N° Evaluacion", width: 120 },
+                { field: "perfil", title: "Perfil", width: 200 },
+                { field: "tipoMascota", title: "Tipo Mascota", width: 200 },
+                { field: "numeroDocumento", title: "Número Documento", width: 150 },
+                { field: "fechaCreacion", title: "Fecha Creación", width: 200, format: "{0:dd/MM/yyyy}" },
+                { field: "puntaje", title: "Puntaje", width: 150 }
+
+            ]
+        });
+    });
+</script>

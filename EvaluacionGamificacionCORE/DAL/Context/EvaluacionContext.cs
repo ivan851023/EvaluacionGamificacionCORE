@@ -26,11 +26,14 @@ namespace EvaluacionGamificacionCORE.DAL.Context
 
         public DbSet<Puntuacion> Puntuaciones { get; set; }
 
+        public DbSet<VwPuntuacion> VwPuntuaciones { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new PerfilMap());
             modelBuilder.ApplyConfiguration(new TipoMascotaMap());
             modelBuilder.ApplyConfiguration(new PuntuacionMap());
+            modelBuilder.ApplyConfiguration(new VwPuntuacionMap());
 
         }
 

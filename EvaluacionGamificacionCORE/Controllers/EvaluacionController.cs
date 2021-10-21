@@ -1,6 +1,9 @@
 ﻿using EvaluacionGamificacionCORE.DAL.Context;
 using EvaluacionGamificacionCORE.DAL.Entity;
 using EvaluacionGamificacionCORE.Models;
+using Kendo.Mvc.Extensions;
+using Kendo.Mvc.Resources;
+using Kendo.Mvc.UI;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Configuration;
@@ -10,6 +13,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using static EvaluacionGamificacionCORE.Models.EvaluacionModel;
 
+
 namespace EvaluacionGamificacionCORE.Controllers
 {
     public class EvaluacionController : Controller
@@ -17,11 +21,12 @@ namespace EvaluacionGamificacionCORE.Controllers
         private IConfiguration _configuration;
         private EvaluacionContext Context { get; }
 
-        public EvaluacionController(IConfiguration configuration, IPerfil iperfil, ITipoMascota itipomascota, IPuntuacion ipuntuacion)
+        public EvaluacionController(IConfiguration configuration, IPerfil iperfil, ITipoMascota itipomascota, IPuntuacion ipuntuacion, IVwPuntuacion ivwpuntuacion)
         {
             _perfil = iperfil;
             _tipomascota = itipomascota;
             _puntuacion = ipuntuacion;
+            _vwpuntuacion = ivwpuntuacion;
             _configuration = configuration;
 
         }
@@ -31,6 +36,8 @@ namespace EvaluacionGamificacionCORE.Controllers
         private readonly ITipoMascota _tipomascota;
 
         private readonly IPuntuacion _puntuacion;
+
+        private readonly IVwPuntuacion _vwpuntuacion;
 
         [HttpGet]
         public IActionResult Index()
@@ -87,6 +94,38 @@ namespace EvaluacionGamificacionCORE.Controllers
             }
             
         }
+        [HttpGet]
+        public IActionResult ReportePuntaje()
+        {
+            return View();
+        }
 
+        [HttpGet]
+        public IEnumerable<VwPuntuacion> LoadGridReportes(DataSourceRequest request)
+        {
+            IEnumerable<VwPuntuacion> result = _vwpuntuacion.GetDetallePuntuaciones().OrderByDescending(p => p.Id);
+            var listGrid = (from x in result
+                            select new VwPuntuacion
+                            {
+
+                                Id =  x.Id,
+                                Perfil = x.Perfil,
+                                TipoMascota = x.TipoMascota,
+                                NumeroDocumento = x.NumeroDocumento,
+                                FechaCreacion = x.FechaCreacion,
+                                Puntaje = x.Puntaje
+
+
+                            }).AsEnumerable();
+
+            return listGrid;
+        }
+        
+        [HttpPost]
+        public IActionResult ExportarExcel(string contentType, string base64, string filename)
+        {
+            var fileContents = Convert.FromBase64String(base64);
+            return File(fileContents, contentType, filename);
+        }
     }
 }
