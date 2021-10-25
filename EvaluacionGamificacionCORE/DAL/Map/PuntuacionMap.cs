@@ -24,6 +24,9 @@ namespace EvaluacionGamificacionCORE.DAL.Map
             entity.Property(e => e.FechaCreacion).HasColumnName("FECHA_CREACION");
             entity.Property(e => e.Puntaje).HasColumnName("PUNTAJE");
 
+            //entity.HasMany(e => e.Perfil).WithOne(e => e.Puntuacion).HasForeignKey(x => x.Puntuacion);
+            //entity.HasOne(x => x.Perfil).WithMany(e => e.Puntuaciones).HasForeignKey(x => x.IdPerfil);
+
         }
     }
 }

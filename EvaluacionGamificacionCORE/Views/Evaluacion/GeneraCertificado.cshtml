@@ -1,0 +1,109 @@
+﻿
+@{
+    ViewData["Title"] = "GeneraCertificado";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div id="grid"></div>
+<script>
+    $(document).ready(function () {
+        $("#grid").kendoGrid({
+            toolbar: ["excel", "pdf"],
+            excel: {
+                fileName: "ReportePuntajes.xlsx",
+                proxyURL: "@Url.Action("ExportarExcel","Evaluacion")",
+                filterable: true
+            },
+            dataSource: {
+                type: "json",
+                transport: {
+                    read: {
+                        url: "@Url.Action("LoadGridCertificados", "Evaluacion")",
+                        contentType: "application/json; charset=utf-8",
+                        type: "GET"
+                    }
+
+               },
+                schema: {
+                    model: {
+
+                        fields: {
+                            id: { type: "number" },
+                            numeroDocumento: { type: "string" },
+                            fechaCreacion: { type: "date" },
+                            puntaje: { type: "number" }
+                        }
+                    }
+                },
+                pageSize: 10
+            },
+            height: 550,
+            filterable: true,
+            sortable: true,
+            pageable: true,
+            columns: [
+
+                { template: "<a class='btn btn-primary' onclick = 'GenerarPDF(#: id #)'>Generar Certificado</a>"},
+                { field: "id", title: "N° Evaluacion", width: 120 },
+                { field: "numeroDocumento", title: "Número Documento", width: 150 },
+                { field: "fechaCreacion", title: "Fecha Creación", width: 200, format: "{0:dd/MM/yyyy}" },
+                { field: "puntaje", title: "Puntaje", width: 150 }
+
+            ]
+        });
+    });
+
+    function base64ToArrayBuffer(base64) {
+        var binaryString = window.atob(base64);
+        var binaryLen = binaryString.length;
+        var bytes = new Uint8Array(binaryLen);
+        for (var i = 0; i < binaryLen; i++) {
+            var ascii = binaryString.charCodeAt(i);
+            bytes[i] = ascii;
+        }
+        return bytes;
+    }
+
+    function savebytearray(reportName, byte) {
+        var blob = new Blob([byte], { type: "application/pdf" });
+        var link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        var fileName = reportName;
+        link.download = fileName;
+        link.click();
+    };
+
+
+    function GenerarPDF(recibido) {
+
+            if (recibido != undefined) {
+
+                $.ajax({
+                    url: '@Url.Action("DescargarPdf", "Evaluacion")',
+                    method: "POST",
+                    data: {
+                        id: recibido,
+                    },
+                    error: function (data) {
+
+                    },
+                    success: function (data) {
+
+                        @*if (data.tipo == "@CompensacionesySalarios.Helpers.TipoMensaje.Error") {
+
+                            ShowMessageWarning(data.mensaje);
+                            event.preventDefault(event);
+                            return;
+                        }*@
+
+                        var name = data.filename;
+                        var samplearr = base64ToArrayBuffer(data.data);
+                        savebytearray(name, samplearr);
+                    }
+                });
+            }
+        }
+
+
+</script>
+

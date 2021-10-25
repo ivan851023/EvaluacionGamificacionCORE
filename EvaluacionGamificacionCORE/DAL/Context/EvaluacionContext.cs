@@ -34,7 +34,6 @@ namespace EvaluacionGamificacionCORE.DAL.Context
             modelBuilder.ApplyConfiguration(new TipoMascotaMap());
             modelBuilder.ApplyConfiguration(new PuntuacionMap());
             modelBuilder.ApplyConfiguration(new VwPuntuacionMap());
-
         }
 
     }

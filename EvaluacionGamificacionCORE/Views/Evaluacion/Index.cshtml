@@ -413,22 +413,80 @@
     var colors = ['#16a085', '#27ae60', '#2c3e50', '#f39c12', '#e74c3c', '#9b59b6', '#FB6964', "#472E32", "#FF4136", "#39CCCC", "#BDBB99", "#77B1A9", "#73A857"];
     var username = '';
     var myColor;
-    var all_questions = [{
-        question_string: "Despues de dos semanas decides cambiar la arena de tu gato",
-        choices: {
-            correct: "a",
-            wrong: ["c", "k", "m"]
+
+    var all_questions = [
+        {
+            question_string: "Te vas por dos días y dejas a tu perro solo con agua y mucha comida",
+            choices: {
+                correct: "Muy en desacuerdo",
+                wrong: ["No estas seguro", "Se puede hacer", "Muy de acuerdo "]
+            }
+        }, {
+            question_string: "Sales para pasear a tu perro al parque y solo necesitas llevar la correa y el collar",
+            choices: {
+                correct: "Muy en desacuerdo",
+                wrong: ["Llevo todo necesario", "No se que mas llevar", "Muy de acuerdo "]
+            }
+        },
+        {
+            question_string: "Vas paseando con tu perro y él muerde a otro perro que se acercó a olerlo. Tú decides llevar a los dos perros al veterinario.",
+            choices: {
+                correct: "Muy de acuerdo",
+                wrong: ["No necesidad de llevar a mi perro", "Si no veo sangre no lo llevo", "Muy en desacuerdo"]
+            }
+        },
+        {
+            question_string: "Llega a casa y ves que tu perro ha destruido el sofá. Tú decides dejarlo encerrado para que no vuelva a pasar ",
+            choices: {
+                correct: "Muy en desacuerdo",
+                wrong: ["Es mejor castigarlo", "Hay que pegarle para que aprenda", "Muy de acuerdo"]
+            }
+        },
+        {
+            question_string: "Te das cuenta de que tu perro se ha perdido. Decides conseguirte otro perro que lo remplace.",
+            choices: {
+                correct: "Muy en desacuerdo",
+                wrong: ["Nunca aparecen cuando se pierden", "Lo pensarías ", "Muy de acuerdo"]
+            }
+        },
+            {
+            question_string: "Ves que tu perro tiene problemas de salud, así que le das remedios caseros hasta que se mejore",
+            choices: {
+                correct: "Muy en desacuerdo",
+                wrong: ["No hay necesidad de llevarlo al veterinario", "Son cosas pasajeras", "Muy de acuerdo"]
+            }
+        },
+        {
+            question_string: "Notas en tu perro un comportamiento de ansiedad por separación, así que decides establecer una rutina de paseos y juegos con él.",
+            choices: {
+                correct: "Muy de acuerdo",
+                wrong: ["Los perros no sufren de anciedad ", "Se tiene que acostumbrar a estar solo", "Muy en desacuerdo"]
+            }
+        },
+        {
+            question_string: "Ves que tu perro le tiene miedo a otros perros, así que decides pasearlo por zonas donde no hay más perros",
+            choices: {
+                correct: "Muy en desacuerdo",
+                wrong: ["Ya no tiene cura ", "No sabes", "Muy de acuerdo"]
+            }
+        },
+        {
+            question_string: "Ves que tu perro roba tu comida, así que decides gritarle NO y premiarlo cuando se aleje de ella.",
+            choices: {
+                correct: "Muy de acuerdo",
+                wrong: ["Muy en desacuerdo", "Hay que pegarle para que aprenda","No dejarle comida a la vista"]
+            }
+        },
+        {
+            question_string: "Las visitas al veterinario son al menos 1 vez por año ",
+            choices: {
+                correct: "Muy de acuerdo",
+                wrong: ["Muy en desacuerdo", "Con remedios caseros vasta", "Solo ir cuando esta enfermo"]
+            }
         }
-    }, {
-        question_string: "Decides dejar tu mascota con mucha agua y comida",
-        choices: {
-            correct: "b",
-            wrong: ["s", "u", "s"]
-        }
+    ];
 
 
-
-        }];
     var score = 0;
     var percentage = 0;
 
@@ -511,12 +569,12 @@
 
         // Add listener for the submit answers button
 
-     
+
         $('#submitButton').click(function () {
-            
+
             changeColor();
             // Determine how many questions the user got right
-            
+
             var response = false;
             var values = [];
             var id = 0;
@@ -524,7 +582,7 @@
             for (var i = 0; i < self.questions.length; i++) {
 
                 id++;
-               
+
 
                 if (self.questions[i].user_choice_index === self.questions[i].correct_choice_index) {
                     score++;
@@ -543,15 +601,15 @@
                     });
                 }
 
-                
+
             }
             // Display the score with the appropriate message
             percentage = (score / self.questions.length);
 
             Guardar(values);
 
-            
-            
+
+
 
             var scoremessage = score + " de " + self.questions.length + " respuestas son correctas.";
             var icon = '';
@@ -566,13 +624,13 @@
                 icon = "fa fa-smile-o";
                 message = 'Felicidades eres apto para adoptar';
                 chartcolor = "green";
-           
+
             } else {
                 icon = "fa fa-meh-o";
                 message = 'Lo siento no eres apto para adoptar';
                 chartcolor = "red";
             }
-            $('.score-label h1').html('<small>Hola </small>' + username + ', ' + 'Tu Puntaje<i class="smiley"></i>');
+            $('.score-label h1').html('Tu Puntaje<i class="smiley"></i>');
             $('.message').text(message);
             $('.score-detail h3').text(scoremessage);
             $('.smiley').addClass(icon);
@@ -702,6 +760,7 @@
         });
     }
     $(document).ready(function () {
+                
         changeColor();
         $('.perfil-box').hide();
         $('.mascota-box').hide();
@@ -757,7 +816,7 @@
 
     function Guardar(values)
     {
-        
+
         (async () => {
                     const rawResponse = await fetch('@Url.Action("Guardar", "Evaluacion")', {
                         method: 'POST',
@@ -774,24 +833,7 @@
     };
 
 
-
-
-    function createJSON() {
-        jsonObj = [];
-        $("input[class=email]").each(function () {
-
-            var id = $(this).attr("title");
-            var email = $(this).val();
-
-            item = {}
-            item["title"] = id;
-            item["email"] = email;
-
-            jsonObj.push(item);
-        });
-
-        console.log(jsonObj);
-    }
+       
 
 </script>
 

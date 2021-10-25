@@ -31,5 +31,7 @@ namespace EvaluacionGamificacionCORE.Models
 
         public long Puntaje { get; set; }
 
+        public string RutaPdf { get; set; }
+
     }
 }

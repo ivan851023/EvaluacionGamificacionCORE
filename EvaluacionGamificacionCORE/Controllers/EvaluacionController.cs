@@ -1,14 +1,18 @@
 ﻿using EvaluacionGamificacionCORE.DAL.Context;
 using EvaluacionGamificacionCORE.DAL.Entity;
 using EvaluacionGamificacionCORE.Models;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
 using Kendo.Mvc.Extensions;
 using Kendo.Mvc.Resources;
 using Kendo.Mvc.UI;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using static EvaluacionGamificacionCORE.Models.EvaluacionModel;
@@ -21,6 +25,7 @@ namespace EvaluacionGamificacionCORE.Controllers
         private IConfiguration _configuration;
         private EvaluacionContext Context { get; }
 
+
         public EvaluacionController(IConfiguration configuration, IPerfil iperfil, ITipoMascota itipomascota, IPuntuacion ipuntuacion, IVwPuntuacion ivwpuntuacion)
         {
             _perfil = iperfil;
@@ -28,6 +33,7 @@ namespace EvaluacionGamificacionCORE.Controllers
             _puntuacion = ipuntuacion;
             _vwpuntuacion = ivwpuntuacion;
             _configuration = configuration;
+
 
         }
 
@@ -72,8 +78,8 @@ namespace EvaluacionGamificacionCORE.Controllers
 
             return new SelectList(tipoMascota, "Value", "Text");
         }
-
-        public IActionResult Guardar([FromBody]EvaluacionModel model)
+        [HttpPost]
+        public IActionResult Guardar([FromBody] EvaluacionModel model)
         {
             try
             {
@@ -84,7 +90,7 @@ namespace EvaluacionGamificacionCORE.Controllers
                 table.FechaCreacion = DateTime.Now;
                 table.Puntaje = model.Puntaje;
                 _puntuacion.Insert(table);
-                
+
                 return View();
             }
             catch (Exception)
@@ -92,7 +98,7 @@ namespace EvaluacionGamificacionCORE.Controllers
 
                 throw;
             }
-            
+
         }
         [HttpGet]
         public IActionResult ReportePuntaje()
@@ -101,14 +107,14 @@ namespace EvaluacionGamificacionCORE.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<VwPuntuacion> LoadGridReportes(DataSourceRequest request)
+        public IEnumerable<VwPuntuacion> LoadGridReportes()
         {
             IEnumerable<VwPuntuacion> result = _vwpuntuacion.GetDetallePuntuaciones().OrderByDescending(p => p.Id);
             var listGrid = (from x in result
                             select new VwPuntuacion
                             {
 
-                                Id =  x.Id,
+                                Id = x.Id,
                                 Perfil = x.Perfil,
                                 TipoMascota = x.TipoMascota,
                                 NumeroDocumento = x.NumeroDocumento,
@@ -120,12 +126,238 @@ namespace EvaluacionGamificacionCORE.Controllers
 
             return listGrid;
         }
-        
+
+
+        [HttpGet]
+        public List<Puntuacion> GetAllPuntuaciones()
+        {
+            List<Puntuacion> result = _puntuacion.GetPuntuaciones().ToList();
+            List<Perfil> perfil = _perfil.GetPerfiles().ToList();
+
+
+            return result;
+        }
+
         [HttpPost]
         public IActionResult ExportarExcel(string contentType, string base64, string filename)
         {
             var fileContents = Convert.FromBase64String(base64);
             return File(fileContents, contentType, filename);
         }
+
+        [HttpGet]
+        public IActionResult GeneraCertificado()
+        {
+            return View();
+        }
+
+
+        [HttpGet]
+        public IEnumerable<VwPuntuacion> LoadGridCertificados()
+        {
+            IEnumerable<VwPuntuacion> result = _vwpuntuacion.GetDetallePuntuaciones().OrderByDescending(p => p.Id);
+            var listGrid = (from x in result
+                            select new VwPuntuacion
+                            {
+
+                                Id = x.Id,
+                                NumeroDocumento = x.NumeroDocumento,
+                                FechaCreacion = x.FechaCreacion,
+                                Puntaje = x.Puntaje
+
+
+                            }).Where(x => x.Puntaje >= 80).AsEnumerable();
+
+            return listGrid;
+        }
+
+        [HttpPost]
+        public JsonResult DescargarPdf(string id)
+        {
+            Document doc = new Document(PageSize.LETTER);
+            doc.SetMargins(75f, 75f, 40f, 20f);
+            var ruta = _configuration["RutaPdf"].ToString();
+
+            var rutaArchivo = Path.Combine(ruta, "Prueba.pdf");
+
+            PdfWriter.GetInstance(doc, new FileStream(rutaArchivo, FileMode.Create));
+            doc.Open();
+
+            CreateCertificadoPDF(doc);
+
+
+            doc.Close();
+            MemoryStream workStream = new MemoryStream();
+            byte[] byteInfo = workStream.ToArray();
+            workStream.Write(byteInfo, 0, byteInfo.Length);
+            workStream.Position = 0;
+
+            var base64string = ObtenerStringBase64Archivo(rutaArchivo);
+            return Json(new { data = base64string, filename = "Certificado".Replace(".pdf", "") });
+                        
+        }
+
+        public void CreateCertificadoPDF(Document doc)
+        {
+            var fuenteNormal = FontFactory.GetFont(FontFactory.HELVETICA, 12);
+            var fuenteNegrita = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12);
+           
+            float marginLine = 1.5f;
+            float[] headers = { 60, 60 }; //Header Widths  
+
+            doc = agregarEncabezadoFalabella(doc, headers);
+
+            Paragraph phrase = new Paragraph
+            {
+                Alignment = Element.ALIGN_CENTER
+            };
+            phrase.Add(new Chunk("CERTIFICADO IDONEIDAD ADOPCION MASCOTAS", fuenteNegrita));
+            insertarLineaEnBlanco(phrase, 3);
+            doc.Add(phrase);
+
+            phrase = new Paragraph
+            {
+                Alignment = Element.ALIGN_JUSTIFIED
+            };
+            phrase.Add(new Chunk("Entre los suscritos ", fuenteNormal));
+            phrase.Add(new Chunk("Lizeth Hurtado", fuenteNegrita));
+            phrase.Add(new Chunk(" identificado con cédula de ciudadanía " + "123456789" + "", fuenteNormal));
+            phrase.Add(new Chunk(" FALABELLA DE COLOMBIA S.A.,", fuenteNegrita));
+            phrase.Add(new Chunk(" quien se denomina", fuenteNormal));
+            phrase.Add(new Chunk(" EL ADOPTANTE", fuenteNegrita));
+            phrase.Add(new Chunk(", y de otra parte, ", fuenteNormal));
+            phrase.Add(new Chunk("Iván Enríquez", fuenteNegrita));
+            phrase.Add(new Chunk(", identificado(a) con cédula de ciudadanía número ", fuenteNormal));
+            phrase.Add(new Chunk("1013000007", fuenteNegrita));
+            phrase.Add(new Chunk(", quien en adelante se denomina,", fuenteNormal));
+            phrase.Add(new Chunk(" Representante fundaciones", fuenteNegrita));
+            phrase.Add(new Chunk(", ha convenido de manera libre y espontanea de dar la respectiva aprobacion para empezar el proceso de adopción.", fuenteNormal));
+            phrase.SetLeading(marginLine, marginLine);
+            insertarLineaEnBlanco(phrase, 2);
+            doc.Add(phrase);
+
+
+            
+          
+
+            PdfPTable tabla = new PdfPTable(2);
+            tabla.SetWidths(headers);
+            tabla.WidthPercentage = 100;
+
+            tabla.AddCell(obtenerCeldaConTextoFirma("REPRESENTANTE DE FUNDACIONES", 12, Font.BOLD, 12, 12, Element.ALIGN_LEFT));
+            tabla.AddCell(obtenerCeldaConTextoFirma("ADOPTANTE", 12, Font.BOLD, 12, 12, Element.ALIGN_LEFT));
+
+            Image imagenFirma = AgregarImagenPdfParametrizada();
+            imagenFirma.ScaleToFit(80f, 80f);
+            tabla.AddCell(obtenerCeldaImagen(imagenFirma, 0, 0, 0, 0, 0, 0, 10, 0, Element.ALIGN_LEFT));
+
+            tabla.AddCell(obtenerCeldaConTextoFirma("", 10, Font.NORMAL, 0, 0, Element.ALIGN_LEFT));
+
+            tabla.AddCell(obtenerCeldaConTextoFirma("Lizeth Hurtado", 12, Font.NORMAL, 12, 12, Element.ALIGN_LEFT));
+            tabla.AddCell(obtenerCeldaConTextoFirma("Iván Enríquez", 12, Font.NORMAL, 12, 12, Element.ALIGN_LEFT));
+            tabla.AddCell(obtenerCeldaConTextoFirma("C.C. " + "123456789", 12, Font.NORMAL, 0, 12, Element.ALIGN_LEFT));
+            tabla.AddCell(obtenerCeldaConTextoFirma("C.C. " + "1013000007", 12, Font.NORMAL, 0, 12, Element.ALIGN_LEFT));
+            doc.Add(tabla);
+
+           
+        }
+
+        public Paragraph insertarLineaEnBlanco(Paragraph paragraph, int numeroSaltosBlanco)
+        {
+            for (int i = 0; i < numeroSaltosBlanco; i++)
+            {
+                paragraph.Add(Chunk.NEWLINE);
+            }
+
+            return paragraph;
+        }
+
+        private PdfPCell obtenerCeldaConTextoFirma(string texto, float tamanoFuente,
+            int tipoFuente, float paddingTop, float paddingLeft, int horizontalAlignment)
+        {
+            var phrase = new Paragraph
+            {
+                new Chunk(texto, FontFactory.GetFont(FontFactory.HELVETICA, tamanoFuente, tipoFuente))
+            };
+
+            var celda = new PdfPCell(phrase)
+            {
+                PaddingTop = paddingTop,
+                PaddingLeft = paddingLeft,
+                BorderWidthLeft = 0,
+                BorderWidthRight = 0,
+                BorderWidthTop = 0,
+                BorderWidthBottom = 0
+            };
+
+            return celda;
+        }
+
+        public Image AgregarImagenPdfParametrizada()
+        {
+
+            var rutaFirma = _configuration["RutaFirma"].ToString();
+
+
+            var NuevaFirma = Image.GetInstance(rutaFirma);
+            
+
+            return NuevaFirma;
+
+        }
+
+        private PdfPCell obtenerCeldaImagen(Image imagenFirma,
+            int colspan, int estilo,
+            float borderWidthLeft, float borderWidthRight, float borderWidthTop, float BorderWidthBottom,
+            float paddingTop, float paddingBottom, int alineacion
+            )
+        {
+            var celda = new PdfPCell(imagenFirma)
+            {
+                Colspan = colspan,
+                BorderWidthLeft = borderWidthLeft,
+                BorderWidthRight = borderWidthRight,
+                BorderWidthTop = borderWidthTop,
+                BorderWidthBottom = BorderWidthBottom,
+                HorizontalAlignment = alineacion,
+                PaddingTop = paddingTop,
+                PaddingBottom = paddingBottom
+            };
+
+            return celda;
+        }
+
+        public string ObtenerStringBase64Archivo(string ruta)
+        {
+            string base64 = "";
+            byte[] stream = System.IO.File.ReadAllBytes(ruta);
+            base64 = Convert.ToBase64String(stream);
+            return base64;
+        }
+
+        private Document agregarEncabezadoFalabella(Document doc, float[] headers)
+        {
+
+            PdfPTable tabla = new PdfPTable(2);
+            tabla.SetWidths(headers); //Set the pdf headers  
+            tabla.WidthPercentage = 100; //Set the PDF File witdh percentage            
+
+            Image imagenFallabella = AgregarImagenPdfParametrizadaEncabezado();
+            imagenFallabella.ScaleToFit(447f, 420f);
+            tabla.AddCell(obtenerCeldaImagen(imagenFallabella, 12, 0, 0, 0, 0, 0, 0, 0, Element.ALIGN_LEFT));
+            doc.Add(tabla);
+
+            return doc;
+        }
+
+        public Image AgregarImagenPdfParametrizadaEncabezado()
+        {
+            Image imagenEncabezado = Image.GetInstance(_configuration["RutaEncabezado"].ToString());
+
+            return imagenEncabezado;
+        }
+
+
+
     }
 }

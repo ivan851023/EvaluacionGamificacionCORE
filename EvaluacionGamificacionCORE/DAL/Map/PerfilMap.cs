@@ -18,7 +18,6 @@ namespace EvaluacionGamificacionCORE.DAL.Map
             entity.HasIndex(e => e.Id);
             entity.Property(e => e.Id).HasColumnName("ID");
             entity.Property(e => e.Nombre).HasColumnName("NOMBRE");
-           
         }
     }
 }
