@@ -1,5 +1,6 @@
 using EvaluacionGamificacionCORE.DAL.Context;
 using EvaluacionGamificacionCORE.DAL.Repository;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -32,12 +33,15 @@ namespace EvaluacionGamificacionCORE
             services.AddScoped<ITipoMascota, TipoMascotaDAL>();
             services.AddScoped<IPuntuacion, PuntuacionDAL>();
             services.AddScoped<IVwPuntuacion, VwPuntuacionDAL>();
+            services.AddScoped<IUsuario, UsuarioDAL>();
             services.AddControllersWithViews();
             services.AddMvc();
             services.AddMvcCore();
 
             services.AddSingleton<IConfiguration>(Configuration);
 
+
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(x => x.LoginPath = "/autenticacion/login");
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -55,13 +59,15 @@ namespace EvaluacionGamificacionCORE
 
             app.UseRouting();
 
+            app.UseAuthentication();
+
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    name: "Login",
+                    pattern: "{controller=Autenticacion}/{action=Login}/{id?}");
             });
         }
     }

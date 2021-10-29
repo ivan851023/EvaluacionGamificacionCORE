@@ -1,4 +1,5 @@
 ﻿using EvaluacionGamificacionCORE.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -19,8 +20,10 @@ namespace EvaluacionGamificacionCORE.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public IActionResult Index()
         {
+            ViewBag.Nombre = HttpContext.User.Identity.Name;
             return View();
         }
 

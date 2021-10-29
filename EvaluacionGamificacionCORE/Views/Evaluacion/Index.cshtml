@@ -34,18 +34,7 @@
         float: right;
     }
 
-    .name-box {
-        text-align: center;
-        padding: 10%;
-        height: 100%;
-    }
-
-        .name-box span {
-            font-weight: 500;
-            font-size: 3em;
-        }
-
-
+    
     .perfil-box {
         text-align: center;
         padding: 10%;
@@ -326,18 +315,7 @@
         text-align: left;
         font-size: 1.2em;
     }
-
-    #result-stats .fa {
-        margin-right: 5px;
-    }
-
-    #result-stats .fa-check-circle {
-        color: #06ff00;
-    }
-
-    #result-stats .fa-times-circle {
-        color: #ff3d00;
-    }
+      
 </style>
 
 
@@ -345,15 +323,6 @@
 <div class="quiz-box-container">
     <div class="wrapper">
         <div class="quiz-box">
-            <div class="name-box">
-                <span>Número Documento</span>
-                
-                <form id="name-form">
-                    <input type="text" id="name-input-box" class="form-control" />
-                    
-                    <button type="submit" id="name-submit-button">Submit</button>
-                </form>
-            </div>
             <div class="perfil-box">
                 <span>Perfil</span>
                 <div style="white-space:pre"></div>
@@ -389,23 +358,31 @@
                     <h3 class="message"></h3>
                 </div>
             </div>
-            <div id="result-stats">
-                <table>
-                    <tr>
-                        <th>Question</th>
-                        <th>You Selected</th>
-                        <th>Correct Answer</th>
-                    </tr>
-                </table>
-            </div>
         </div>
         <div class="navigation-buttons">
             <button id="nextButton">Next</button>
             <button id="submitButton" class="btn btn-primary">Submit</button>
-            <button id="resultButton">Results</button>
         </div>
     </div>
 </div>
+
+<div class="modal" id="modalInfo" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Información</h5>
+            </div>
+            <div class="modal-body">
+                <p id="mensaje"> </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="btnClose" class="btn btn-secondary" data-dismiss="modal">Aceptar</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <script>
 
@@ -648,31 +625,8 @@
                 barColor: chartcolor
             });
             $('#prevButton, #nextButton, #submitButton').hide();
-            $('.navigation-buttons #resultButton').show();
         });
-        $('#resultButton').click(function () {
-            changeColor();
-            $('#result').hide();
-            var table = $('#result-stats table').find('tbody');
-            var tr;
-            for (var i = 0; i < self.questions.length; i++) {
-                tr = $('<tr>');
-                if (self.questions[i].user_choice_index === self.questions[i].correct_choice_index) {
-                    tr.append('<td><i class="fa fa-check-circle"></i>' + self.questions[i].question_string + '</td>');
-                } else {
-                    tr.append('<td><i class="fa fa-times-circle"></i>' + self.questions[i].question_string + '</td>');
-                }
-                if (self.questions[i].choices[self.questions[i].user_choice_index] !== undefined) {
-                    tr.append('<td>' + self.questions[i].choices[self.questions[i].user_choice_index] + '</td>');
-                } else {
-                    tr.append('<td>' + '<span class="grey">No Attempt</span>' + '</td>');
-                }
-                tr.append('<td>' + self.questions[i].choices[self.questions[i].correct_choice_index] + '</td>');
-                tr.appendTo(table);
-            }
-            $('#result-stats').show();
-            $('#resultButton').hide()
-        });
+
         // Add a listener on the questions container to listen for user select changes. This is for determining whether we can submit answers or not.
         question_container.bind('user-select-change', function () {
             var all_questions_answered = true;
@@ -759,59 +713,52 @@
             container.trigger('user-select-change');
         });
     }
-    $(document).ready(function () {
-                
-        changeColor();
-        $('.perfil-box').hide();
-        $('.mascota-box').hide();
-        $('#name-input-box').css('border-bottom', 'solid thin ' + myColor);
-        var quiz = new Quiz('My Quiz');
-        for (var i = 0; i < all_questions.length; i++) {
-            var question = new Question((i + 1), all_questions[i].question_string, all_questions[i].choices.correct, all_questions[i].choices.wrong);
+    
 
-            // Add the question to the instance of the Quiz object that we created previously
-            quiz.add_question(question);
-        }
-        // Render the quiz
-        var quiz_container = $('#question-box');
-        $('.navigation-buttons').hide();
-        $('#result').hide();
-        $('#result-stats').hide();
-        $('#name-form').on('submit', function (event) {
-            event.preventDefault();
-            username = $('#name-input-box').val();
-            if (username !== '' && username !== undefined) {
-                $('.name-box').hide();
-                $('.perfil-box').show();
-                $('.mascota-box').hide();
-
-            }
+    $("#btnClose").click(function () {
+            window.location.href = '@Url.Action("Index","Home")';
         });
 
+    $(document).ready(function () {
 
+        
+            changeColor();
+            $('.mascota-box').hide();
+            $('#name-input-box').css('border-bottom', 'solid thin ' + myColor);
+            var quiz = new Quiz('My Quiz');
+            for (var i = 0; i < all_questions.length; i++) {
+                var question = new Question((i + 1), all_questions[i].question_string, all_questions[i].choices.correct, all_questions[i].choices.wrong);
 
-        $('#perfil-form').on('submit', function (event) {
-            event.preventDefault();
-            username = $('#name-input-box').val();
-            if (username !== '' && username !== undefined) {
+                // Add the question to the instance of the Quiz object that we created previously
+                quiz.add_question(question);
+            }
+            // Render the quiz
+            var quiz_container = $('#question-box');
+            $('.navigation-buttons').hide();
+            $('#result').hide();
+
+            $('#perfil-form').on('submit', function (event) {
+                event.preventDefault();
                 $('.perfil-box').hide();
                 $('.mascota-box').show();
-
-            }
-        });
+            });
 
 
-        $('#mascota-form').on('submit', function (event) {
-            event.preventDefault();
-            username = $('#name-input-box').val();
-            if (username !== '' && username !== undefined) {
+            $('#mascota-form').on('submit', function (event) {
+                event.preventDefault();
                 $('.mascota-box').hide();
                 quiz.render(quiz_container);
                 $('.navigation-buttons').show();
-                $('#resultButton').hide();
-            }
-        });
+            });
+
     });
+
+
+
+    function showModal(msj) {
+        $("#mensaje").text(msj);
+        $("#modalInfo").modal("show");
+    }
 
 
     function Guardar(values)
@@ -833,7 +780,7 @@
     };
 
 
-       
+
 
 </script>
 

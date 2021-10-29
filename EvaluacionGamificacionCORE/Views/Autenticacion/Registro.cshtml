@@ -1,0 +1,203 @@
+﻿@{ Layout = ""; }
+
+@model UsuarioModel
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="CoreUI - Open Source Bootstrap Admin Template">
+    <meta name="author" content="Łukasz Holeczek">
+    <meta name="keyword" content="CoreUI Bootstrap 4 Admin Template">
+    <!-- <link rel="shortcut icon" href="assets/ico/favicon.png"> -->
+    <title>Registro</title>
+    <!-- Icons -->
+    <link href="~/assets/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <link href="~/assets/css/simple-line-icons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="~/kendoui.for.jquery.2021.2.616.commercial/styles/kendo.common.min.css" />
+    <link rel="stylesheet" href="~/kendoui.for.jquery.2021.2.616.commercial/styles/kendo.material.min.css" />
+    <link rel="stylesheet" href="~/kendoui.for.jquery.2021.2.616.commercial/styles/kendo.default.mobile.min.css" />
+    <script src="~/assets/js/jquery-3.1.1.min.js"></script>
+    <script src="~/kendoui.for.jquery.2021.2.616.commercial/js/kendo.all.min.js"></script>
+    <script src="~/js/jquery.validate.min.js"></script>
+    <script src="~/js/jquery.validate.unobtrusive.min.js"></script>
+
+
+    <!-- Main styles for this application -->
+    <link rel="stylesheet" href="~/assets/css/style.css">
+
+    <style>
+        .input-group-addon, .input-group-btn, .input-group .form-control {
+            display: -ms-flexbox;
+            display: grid;
+            -ms-flex-align: center;
+            align-items: center;
+        }
+    </style>
+</head>
+
+<body class="app flex-row align-items-center">
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <div class="container">
+        <form id="frmRegistro" asp-controller="Autenticacion" asp-action="Registro" method="post">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="card mx-4">
+                        <div class="card-body p-4">
+                            <h1>Registro</h1>
+                            <p class="text-muted">Crear Cuenta</p>
+                            <div class="input-group mb-3 form-group">
+                                <span class="input-group-addon"><i class="icon-user"></i></span>
+                                <input type="text" asp-for="Documento" class="form-control" placeholder="Documento">
+
+                            </div>
+                            <div class="form-group">
+                                <span asp-validation-for="Documento" class="text-danger"></span>
+                            </div>
+                            <div class="input-group mb-3 form-group">
+                                <span class="input-group-addon">@@</span>
+                                <input type="text" asp-for="Email" class="form-control" placeholder="Email">
+                            </div>
+                            <div class="form-group">
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </div>
+                            <div class="input-group mb-4 form-group">
+                                <span class="input-group-addon"><i class="icon-eye"></i></span>
+                                <input type="text" asp-for="Nombre_Completo" class="form-control" placeholder="Nombre Completo">
+
+                            </div>
+                            <div class="form-group">
+                                <span asp-validation-for="Nombre_Completo" class="text-danger"></span>
+                            </div>
+                            <div class="input-group mb-4 form-group">
+                                <span class="input-group-addon"><i class="icon-direction"></i></span>
+                                <input type="text" asp-for="Direccion" class="form-control" placeholder="Direccion">
+                            </div>
+                            <div class="form-group">
+                                <span asp-validation-for="Direccion" class="text-danger"></span>
+                            </div>
+                            <div class="input-group mb-4 form-group">
+                                <span class="input-group-addon"><i class="icon-call-in"></i></span>
+                                <input type="text" asp-for="Telefono" class="form-control" placeholder="Telefono">
+                            </div>
+                            <div class="form-group">
+                                <span asp-validation-for="Telefono" class="text-danger"></span>
+                            </div>
+                            <div class="input-group mb-4 form-group">
+                                <span class="input-group-addon"><i class="icon-calendar"></i></span>
+                                <input class="form-control" asp-for="Fecha_Nacimiento" id="txtFechaNacimiento" placeholder="Fecha Nacimiento" />
+                            </div>
+                            <div class="form-group">
+                                <span asp-validation-for="Fecha_Nacimiento" class="text-danger"></span>
+                            </div>
+                            <div class="input-group mb-3 form-group">
+                                <span class="input-group-addon"><i class="icon-lock"></i></span>
+                                <input type="password" asp-for="Password" class="form-control" placeholder="Password" id="txtPassword">
+                            </div>
+                            <div class="form-group">
+                                <span asp-validation-for="Password" class="text-danger"></span>
+                            </div>
+                            <div class="input-group mb-4 form-group">
+                                <span class="input-group-addon"><i class="icon-lock"></i></span>
+                                <input type="password" asp-for="PasswordConfirm" class="form-control" placeholder="Repeat password">
+                            </div>
+                            <div class="form-group">
+                                <span asp-validation-for="PasswordConfirm" class="text-danger"></span>
+                            </div>
+
+                            <button type="submit" class="btn btn-block btn-success" id="btnGuardar">Crear Usuario</button>
+                        </div>
+                        <div class="card-footer p-4">
+                            <div class="row">
+                                <div class="col-6">
+                                    <button class="btn btn-block btn-facebook" type="button">
+                                        <span>facebook</span>
+                                    </button>
+                                </div>
+                                <div class="col-6">
+                                    <button class="btn btn-block btn-twitter" type="button">
+                                        <span>twitter</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal" id="modalInfo" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Información</h5>
+                </div>
+                <div class="modal-body">
+                    <p id="mensaje"> </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="btnClose" class="btn btn-secondary" data-dismiss="modal">Aceptar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Bootstrap and necessary plugins -->
+    <script src="~/assets/js/popper.min.js"></script>
+    <script src="~/assets/js/bootstrap.min.js"></script>
+
+
+    <script type="text/javascript">
+
+        function showModal(msj) {
+            $("#mensaje").text(msj);
+            $("#modalInfo").modal("show");
+        }
+
+
+
+        $(document).ready(function () {
+            $("#txtFechaNacimiento").kendoDatePicker();
+        });
+
+        $("#btnClose").click(function () {
+            window.location.href = '@Url.Action("Login","Autenticacion")';
+        });
+
+
+
+        $('#btnGuardar').click(function (event) {
+
+            event.preventDefault();
+
+            if ($("form").valid()) {
+                $.ajax({
+                    url: '@Url.Action("Registro", "Autenticacion")',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: $('#frmRegistro').serialize(),
+                    success: function (xhr) {
+                        showModal(xhr.responseText);
+                    },
+                    error: function (xhr, textStatus, errorThrown) {
+                        showModal(xhr.responseText);
+                    }
+                });
+
+            };
+
+
+        });
+
+
+
+
+    </script>
+
+
+
+</body>
+</html>

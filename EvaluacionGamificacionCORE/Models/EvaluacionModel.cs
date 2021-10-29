@@ -27,8 +27,6 @@ namespace EvaluacionGamificacionCORE.Models
 
         public IEnumerable<SelectListItem> lstTipoMascota { get; set; }
 
-        public string NumeroDocumento { get; set; }
-
         public long Puntaje { get; set; }
 
         public string RutaPdf { get; set; }

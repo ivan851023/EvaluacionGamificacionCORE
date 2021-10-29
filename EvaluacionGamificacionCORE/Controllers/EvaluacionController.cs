@@ -26,14 +26,14 @@ namespace EvaluacionGamificacionCORE.Controllers
         private EvaluacionContext Context { get; }
 
 
-        public EvaluacionController(IConfiguration configuration, IPerfil iperfil, ITipoMascota itipomascota, IPuntuacion ipuntuacion, IVwPuntuacion ivwpuntuacion)
+        public EvaluacionController(IConfiguration configuration, IPerfil iperfil, ITipoMascota itipomascota, IPuntuacion ipuntuacion, IVwPuntuacion ivwpuntuacion, IUsuario iusuario)
         {
             _perfil = iperfil;
             _tipomascota = itipomascota;
             _puntuacion = ipuntuacion;
             _vwpuntuacion = ivwpuntuacion;
             _configuration = configuration;
-
+            _usuario = iusuario;
 
         }
 
@@ -45,9 +45,15 @@ namespace EvaluacionGamificacionCORE.Controllers
 
         private readonly IVwPuntuacion _vwpuntuacion;
 
+        private readonly IUsuario _usuario;
+
         [HttpGet]
         public IActionResult Index()
         {
+            //var puntuacion = _puntuacion.GetPuntuaciones().Where(x => x.IdUsuario == Convert.ToInt32(HttpContext.User.Claims.Select(x => x.Value))).FirstOrDefault();
+
+            //ViewBag.Puntaje = (puntuacion == 0 ? true : false);
+            
             EvaluacionModel model = new EvaluacionModel();
             model.lstPerfiles = GetPerfiles();
             model.lstTipoMascota = GetTipoMascotas();
@@ -86,7 +92,7 @@ namespace EvaluacionGamificacionCORE.Controllers
                 Puntuacion table = new Puntuacion();
                 table.IdPerfil = model.SelectValuePerfil;
                 table.IdTipoMascota = model.SelectValueTipoMascota;
-                table.NumeroDocumento = model.NumeroDocumento;
+                table.IdUsuario = Convert.ToInt32(HttpContext.User.Claims.Select(x => x.Value).FirstOrDefault());
                 table.FechaCreacion = DateTime.Now;
                 table.Puntaje = model.Puntaje;
                 _puntuacion.Insert(table);
@@ -117,7 +123,9 @@ namespace EvaluacionGamificacionCORE.Controllers
                                 Id = x.Id,
                                 Perfil = x.Perfil,
                                 TipoMascota = x.TipoMascota,
-                                NumeroDocumento = x.NumeroDocumento,
+                                Documento = x.Documento,
+                                Nombre_Completo = x.Nombre_Completo,
+                                Email = x.Email,
                                 FechaCreacion = x.FechaCreacion,
                                 Puntaje = x.Puntaje
 
@@ -161,7 +169,7 @@ namespace EvaluacionGamificacionCORE.Controllers
                             {
 
                                 Id = x.Id,
-                                NumeroDocumento = x.NumeroDocumento,
+                                Documento = x.Documento,
                                 FechaCreacion = x.FechaCreacion,
                                 Puntaje = x.Puntaje
 
@@ -180,11 +188,16 @@ namespace EvaluacionGamificacionCORE.Controllers
 
             var rutaArchivo = Path.Combine(ruta, "Prueba.pdf");
 
+
             PdfWriter.GetInstance(doc, new FileStream(rutaArchivo, FileMode.Create));
             doc.Open();
 
-            CreateCertificadoPDF(doc);
+            int idPuntaje = Convert.ToInt32(id);
 
+            var puntuacion = _puntuacion.GetPuntuaciones().Where(x => x.Id == idPuntaje).FirstOrDefault();
+            var usuario = _usuario.GetUsuarios().Where(x => x.Id == puntuacion.IdUsuario).FirstOrDefault();
+
+            CreateCertificadoPDF(doc,usuario);
 
             doc.Close();
             MemoryStream workStream = new MemoryStream();
@@ -197,7 +210,7 @@ namespace EvaluacionGamificacionCORE.Controllers
                         
         }
 
-        public void CreateCertificadoPDF(Document doc)
+        public void CreateCertificadoPDF(Document doc, Usuario user)
         {
             var fuenteNormal = FontFactory.GetFont(FontFactory.HELVETICA, 12);
             var fuenteNegrita = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12);
@@ -206,7 +219,7 @@ namespace EvaluacionGamificacionCORE.Controllers
             float[] headers = { 60, 60 }; //Header Widths  
 
             doc = agregarEncabezadoFalabella(doc, headers);
-
+                       
             Paragraph phrase = new Paragraph
             {
                 Alignment = Element.ALIGN_CENTER
@@ -220,13 +233,13 @@ namespace EvaluacionGamificacionCORE.Controllers
                 Alignment = Element.ALIGN_JUSTIFIED
             };
             phrase.Add(new Chunk("Entre los suscritos ", fuenteNormal));
-            phrase.Add(new Chunk("Lizeth Hurtado", fuenteNegrita));
-            phrase.Add(new Chunk(" identificado con cédula de ciudadanía " + "123456789" + "", fuenteNormal));
+            phrase.Add(new Chunk(user.Nombre_Completo, fuenteNegrita));
+            phrase.Add(new Chunk(" identificado con cédula de ciudadanía " + user.Documento + "", fuenteNormal));
             phrase.Add(new Chunk(" FALABELLA DE COLOMBIA S.A.,", fuenteNegrita));
             phrase.Add(new Chunk(" quien se denomina", fuenteNormal));
             phrase.Add(new Chunk(" EL ADOPTANTE", fuenteNegrita));
             phrase.Add(new Chunk(", y de otra parte, ", fuenteNormal));
-            phrase.Add(new Chunk("Iván Enríquez", fuenteNegrita));
+            phrase.Add(new Chunk("Lizeth Hurtado", fuenteNegrita));
             phrase.Add(new Chunk(", identificado(a) con cédula de ciudadanía número ", fuenteNormal));
             phrase.Add(new Chunk("1013000007", fuenteNegrita));
             phrase.Add(new Chunk(", quien en adelante se denomina,", fuenteNormal));
@@ -254,9 +267,10 @@ namespace EvaluacionGamificacionCORE.Controllers
             tabla.AddCell(obtenerCeldaConTextoFirma("", 10, Font.NORMAL, 0, 0, Element.ALIGN_LEFT));
 
             tabla.AddCell(obtenerCeldaConTextoFirma("Lizeth Hurtado", 12, Font.NORMAL, 12, 12, Element.ALIGN_LEFT));
-            tabla.AddCell(obtenerCeldaConTextoFirma("Iván Enríquez", 12, Font.NORMAL, 12, 12, Element.ALIGN_LEFT));
-            tabla.AddCell(obtenerCeldaConTextoFirma("C.C. " + "123456789", 12, Font.NORMAL, 0, 12, Element.ALIGN_LEFT));
+            tabla.AddCell(obtenerCeldaConTextoFirma(user.Nombre_Completo, 12, Font.NORMAL, 12, 12, Element.ALIGN_LEFT));
             tabla.AddCell(obtenerCeldaConTextoFirma("C.C. " + "1013000007", 12, Font.NORMAL, 0, 12, Element.ALIGN_LEFT));
+            tabla.AddCell(obtenerCeldaConTextoFirma("C.C. " + user.Documento, 12, Font.NORMAL, 0, 12, Element.ALIGN_LEFT));
+            
             doc.Add(tabla);
 
            

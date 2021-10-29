@@ -16,7 +16,7 @@ namespace EvaluacionGamificacionCORE.DAL.Entity
 
         public int IdTipoMascota { get; set; }
 
-        public string NumeroDocumento { get; set; }
+        public int IdUsuario { get; set; }
 
         public DateTime FechaCreacion { get; set; }
 

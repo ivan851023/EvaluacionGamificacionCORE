@@ -18,9 +18,12 @@ namespace EvaluacionGamificacionCORE.DAL.Map
             entity.Property(e => e.Id).HasColumnName("ID");
             entity.Property(e => e.Perfil).HasColumnName("PERFIL");
             entity.Property(e => e.TipoMascota).HasColumnName("TIPO_MASCOTA");
-            entity.Property(e => e.NumeroDocumento).HasColumnName("NUMERO_DOCUMENTO");
+            entity.Property(e => e.Documento).HasColumnName("DOCUMENTO");
+            entity.Property(e => e.Nombre_Completo).HasColumnName("NOMBRE_COMPLETO");
+            entity.Property(e => e.Email).HasColumnName("EMAIL");
             entity.Property(e => e.FechaCreacion).HasColumnName("FECHA_CREACION");
             entity.Property(e => e.Puntaje).HasColumnName("PUNTAJE");
+            entity.Property(e => e.IdUsuario).HasColumnName("ID_USUARIO");
 
         }
     }
