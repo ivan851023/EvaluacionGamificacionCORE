@@ -20,7 +20,6 @@ namespace EvaluacionGamificacionCORE.DAL.Context
         {
         }
 
-
         public DbSet<Perfil> Perfiles { get; set; }
         public DbSet<TipoMascota> TipoMascotas { get; set; }
 
@@ -30,6 +29,10 @@ namespace EvaluacionGamificacionCORE.DAL.Context
 
         public DbSet<Usuario> Usuarios { get; set; }
 
+        public DbSet<Preguntas> Preguntas { get; set; }
+
+        public DbSet<Respuestas> Respuestas { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new PerfilMap());
@@ -37,6 +40,8 @@ namespace EvaluacionGamificacionCORE.DAL.Context
             modelBuilder.ApplyConfiguration(new PuntuacionMap());
             modelBuilder.ApplyConfiguration(new VwPuntuacionMap());
             modelBuilder.ApplyConfiguration(new UsuarioMap());
+            modelBuilder.ApplyConfiguration(new PreguntaMap());
+            modelBuilder.ApplyConfiguration(new RespuestaMap());
         }
 
     }

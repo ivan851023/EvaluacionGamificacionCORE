@@ -12,8 +12,7 @@ namespace EvaluacionGamificacionCORE.DAL.Entity
 
     
         public int IdPerfil { get; set; }
-        //public Perfil Perfil { get; set; }
-
+        
         public int IdTipoMascota { get; set; }
 
         public int IdUsuario { get; set; }

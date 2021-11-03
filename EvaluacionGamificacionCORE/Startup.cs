@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -34,13 +35,14 @@ namespace EvaluacionGamificacionCORE
             services.AddScoped<IPuntuacion, PuntuacionDAL>();
             services.AddScoped<IVwPuntuacion, VwPuntuacionDAL>();
             services.AddScoped<IUsuario, UsuarioDAL>();
+            services.AddScoped<IPreguntas, PreguntasDAL>();
+            services.AddScoped<IRespuestas, RespuestasDAL>();
             services.AddControllersWithViews();
             services.AddMvc();
             services.AddMvcCore();
 
             services.AddSingleton<IConfiguration>(Configuration);
-
-
+            
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(x => x.LoginPath = "/autenticacion/login");
         }
 

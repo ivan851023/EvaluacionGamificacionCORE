@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using static EvaluacionGamificacionCORE.Models.EvaluacionModel;
 
@@ -26,7 +27,7 @@ namespace EvaluacionGamificacionCORE.Controllers
         private EvaluacionContext Context { get; }
 
 
-        public EvaluacionController(IConfiguration configuration, IPerfil iperfil, ITipoMascota itipomascota, IPuntuacion ipuntuacion, IVwPuntuacion ivwpuntuacion, IUsuario iusuario)
+        public EvaluacionController(IConfiguration configuration, IPerfil iperfil, ITipoMascota itipomascota, IPuntuacion ipuntuacion, IVwPuntuacion ivwpuntuacion, IUsuario iusuario, IPreguntas ipreguntas, IRespuestas irespuestas)
         {
             _perfil = iperfil;
             _tipomascota = itipomascota;
@@ -34,7 +35,8 @@ namespace EvaluacionGamificacionCORE.Controllers
             _vwpuntuacion = ivwpuntuacion;
             _configuration = configuration;
             _usuario = iusuario;
-
+            _preguntas = ipreguntas;
+            _respuestas = irespuestas;
         }
 
         private readonly IPerfil _perfil;
@@ -46,6 +48,10 @@ namespace EvaluacionGamificacionCORE.Controllers
         private readonly IVwPuntuacion _vwpuntuacion;
 
         private readonly IUsuario _usuario;
+
+        private readonly IPreguntas _preguntas;
+
+        private readonly IRespuestas _respuestas;
 
         [HttpGet]
         public IActionResult Index()
@@ -371,7 +377,52 @@ namespace EvaluacionGamificacionCORE.Controllers
             return imagenEncabezado;
         }
 
+        [HttpPost]
+        public JsonResult GetRespuestasPreguntas([FromBody] EvaluacionModel model)
+        {
 
+            var preguntas = _preguntas.GetPreguntas().Where(x => x.IdPerfil == Convert.ToInt32(model.SelectValuePerfil)
+            && x.IdTipoMascota == Convert.ToInt32(model.SelectValueTipoMascota));
+
+            var respuestas = _respuestas.GetRespuestas().Where(y => preguntas.Contains(y.Preguntas));
+
+
+            List<AllQuestions> lstQuestions = new List<AllQuestions>();
+
+
+            foreach (var item in preguntas)
+            {
+                AllQuestions all = new AllQuestions();
+                all.Choices = new Choices();
+                all.Choices.Correct = new List<string>();
+                all.Choices.Wrong = new List<string>();
+                all.Question = item.Pregunta;
+
+                foreach (var j in respuestas.Where(x => x.Id_Pregunta == item.id))
+                {
+                    if (j.Correcta)
+                    {
+                        all.Choices.Correct.Add(j.Respuesta);
+                    }
+                    else
+                    {
+                        all.Choices.Wrong.Add(j.Respuesta);
+                    }
+
+                    
+                }
+                lstQuestions.Add(all);
+            }
+
+
+
+            var json = JsonSerializer.Serialize(lstQuestions);
+
+            TempData["JsonPreguntas"] = json;
+
+            return Json(lstQuestions);
+
+        }
 
     }
 }

@@ -391,7 +391,8 @@
     var username = '';
     var myColor;
 
-    var all_questions = [
+
+    var all_questions_example = [
         {
             question_string: "Te vas por dos días y dejas a tu perro solo con agua y mucha comida",
             choices: {
@@ -713,7 +714,7 @@
             container.trigger('user-select-change');
         });
     }
-    
+
 
     $("#btnClose").click(function () {
             window.location.href = '@Url.Action("Index","Home")';
@@ -721,19 +722,11 @@
 
     $(document).ready(function () {
 
-        
+
             changeColor();
             $('.mascota-box').hide();
             $('#name-input-box').css('border-bottom', 'solid thin ' + myColor);
             var quiz = new Quiz('My Quiz');
-            for (var i = 0; i < all_questions.length; i++) {
-                var question = new Question((i + 1), all_questions[i].question_string, all_questions[i].choices.correct, all_questions[i].choices.wrong);
-
-                // Add the question to the instance of the Quiz object that we created previously
-                quiz.add_question(question);
-            }
-            // Render the quiz
-            var quiz_container = $('#question-box');
             $('.navigation-buttons').hide();
             $('#result').hide();
 
@@ -743,13 +736,6 @@
                 $('.mascota-box').show();
             });
 
-
-            $('#mascota-form').on('submit', function (event) {
-                event.preventDefault();
-                $('.mascota-box').hide();
-                quiz.render(quiz_container);
-                $('.navigation-buttons').show();
-            });
 
     });
 
@@ -761,25 +747,71 @@
     }
 
 
+
+    $('#ddlTipoMascota').on('change', function () {
+
+
+        (async () => {
+            const rawResponse = await fetch('@Url.Action("GetRespuestasPreguntas", "Evaluacion")', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ SelectValuePerfil: $("#ddlPerfil").val(), SelectValueTipoMascota: $("#ddlTipoMascota").val() })
+            }).then((response) => {
+                return response.json().then((data) => {
+                    console.log(data);
+                    return data;
+                }).catch((err) => {
+                    console.log(err);
+                })
+            });
+
+        })();
+
+        var all_questions = '@TempData["JsonPreguntas"]';
+
+     
+
+        $('#name-input-box').css('border-bottom', 'solid thin ' + myColor);
+        var quiz = new Quiz('My Quiz');
+        for (var i = 0; i < all_questions.length; i++) {
+            var question = new Question((i + 1), all_questions[i].question, all_questions[i].choices.correct, all_questions[i].choices.wrong);
+
+            // Add the question to the instance of the Quiz object that we created previously
+            quiz.add_question(question);
+        }
+        //Render the quiz
+        var quiz_container = $('#question-box');
+
+
+        $('#mascota-form').on('submit', function (event) {
+            event.preventDefault();
+            $('.mascota-box').hide();
+            quiz.render(quiz_container);
+            $('.navigation-buttons').show();
+        });
+
+    });
+
     function Guardar(values)
     {
 
         (async () => {
-                    const rawResponse = await fetch('@Url.Action("Guardar", "Evaluacion")', {
-                        method: 'POST',
-                        headers: {
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ SelectValuePerfil: $("#ddlPerfil").val(), SelectValueTipoMascota: $("#ddlTipoMascota").val(), lstRespuestas: values, NumeroDocumento: username, Puntaje: percentage * 100})
-                    });
-                    const content = await rawResponse.json();
+            const rawResponse = await fetch('@Url.Action("Guardar", "Evaluacion")', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ SelectValuePerfil: $("#ddlPerfil").val(), SelectValueTipoMascota: $("#ddlTipoMascota").val(), lstRespuestas: values, NumeroDocumento: username, Puntaje: percentage * 100 })
+            });
+            const content = await rawResponse.json();
 
-                })();
+        })();
 
     };
-
-
 
 
 </script>
