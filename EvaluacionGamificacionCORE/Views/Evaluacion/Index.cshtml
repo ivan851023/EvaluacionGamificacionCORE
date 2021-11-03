@@ -18,14 +18,17 @@
         height: 350px;
         width: 700px;
         margin: 40px auto;
+        padding-right:900px;
     }
 
     .quiz-box {
-        height: 100%;
+        height: 80%;
+        width : 930px;
         border: 3px solid rgba(255, 255, 255, 1);
         background-color: #000;
         border-radius: 0px 10%;
         box-shadow: 0px 0px 13px 2px rgb(0, 0, 0);
+        align-content:center;
     }
 
     .navigation-buttons {
@@ -220,7 +223,7 @@
         float: left;
         padding-left: 20px;
         font-weight: 500;
-        font-size: 1.3em;
+        font-size: 1em;
     }
 
     /*Pie chart style starts*/
@@ -315,6 +318,10 @@
         text-align: left;
         font-size: 1.2em;
     }
+
+    h2, .h2 {
+        font-size: 1rem;
+    }
       
 </style>
 
@@ -327,7 +334,7 @@
                 <span>Perfil</span>
                 <div style="white-space:pre"></div>
                 <form id="perfil-form">
-                    @Html.DropDownListFor(x => x.SelectValuePerfil, Model.lstPerfiles, "Seleccione una opción", new {@class = "form-control",@id = "ddlPerfil" })
+                    @Html.DropDownListFor(x => x.SelectValuePerfil, Model.lstPerfiles, "Seleccione una opción", new { @class = "form-control", @id = "ddlPerfil" })
 
                     <button type="submit" id="name-submit-button">Submit</button>
                 </form>
@@ -358,13 +365,22 @@
                     <h3 class="message"></h3>
                 </div>
             </div>
+            <div class="navigation-buttons">
+                <div class="col text-right">
+                    <button id="nextButton" class="btn btn-secondary">Next</button>
+                    <button id="submitButton" class="btn btn-primary">Submit</button>
+                </div>
+                
+            </div>
         </div>
-        <div class="navigation-buttons">
-            <button id="nextButton">Next</button>
-            <button id="submitButton" class="btn btn-primary">Submit</button>
-        </div>
+
+        
+
+
     </div>
+    
 </div>
+
 
 <div class="modal" id="modalInfo" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog" role="document">
@@ -383,7 +399,7 @@
     </div>
 </div>
 
-
+<input type="hidden" id="hfJson" />
 <script>
 
 
@@ -391,78 +407,6 @@
     var username = '';
     var myColor;
 
-
-    var all_questions_example = [
-        {
-            question_string: "Te vas por dos días y dejas a tu perro solo con agua y mucha comida",
-            choices: {
-                correct: "Muy en desacuerdo",
-                wrong: ["No estas seguro", "Se puede hacer", "Muy de acuerdo "]
-            }
-        }, {
-            question_string: "Sales para pasear a tu perro al parque y solo necesitas llevar la correa y el collar",
-            choices: {
-                correct: "Muy en desacuerdo",
-                wrong: ["Llevo todo necesario", "No se que mas llevar", "Muy de acuerdo "]
-            }
-        },
-        {
-            question_string: "Vas paseando con tu perro y él muerde a otro perro que se acercó a olerlo. Tú decides llevar a los dos perros al veterinario.",
-            choices: {
-                correct: "Muy de acuerdo",
-                wrong: ["No necesidad de llevar a mi perro", "Si no veo sangre no lo llevo", "Muy en desacuerdo"]
-            }
-        },
-        {
-            question_string: "Llega a casa y ves que tu perro ha destruido el sofá. Tú decides dejarlo encerrado para que no vuelva a pasar ",
-            choices: {
-                correct: "Muy en desacuerdo",
-                wrong: ["Es mejor castigarlo", "Hay que pegarle para que aprenda", "Muy de acuerdo"]
-            }
-        },
-        {
-            question_string: "Te das cuenta de que tu perro se ha perdido. Decides conseguirte otro perro que lo remplace.",
-            choices: {
-                correct: "Muy en desacuerdo",
-                wrong: ["Nunca aparecen cuando se pierden", "Lo pensarías ", "Muy de acuerdo"]
-            }
-        },
-            {
-            question_string: "Ves que tu perro tiene problemas de salud, así que le das remedios caseros hasta que se mejore",
-            choices: {
-                correct: "Muy en desacuerdo",
-                wrong: ["No hay necesidad de llevarlo al veterinario", "Son cosas pasajeras", "Muy de acuerdo"]
-            }
-        },
-        {
-            question_string: "Notas en tu perro un comportamiento de ansiedad por separación, así que decides establecer una rutina de paseos y juegos con él.",
-            choices: {
-                correct: "Muy de acuerdo",
-                wrong: ["Los perros no sufren de anciedad ", "Se tiene que acostumbrar a estar solo", "Muy en desacuerdo"]
-            }
-        },
-        {
-            question_string: "Ves que tu perro le tiene miedo a otros perros, así que decides pasearlo por zonas donde no hay más perros",
-            choices: {
-                correct: "Muy en desacuerdo",
-                wrong: ["Ya no tiene cura ", "No sabes", "Muy de acuerdo"]
-            }
-        },
-        {
-            question_string: "Ves que tu perro roba tu comida, así que decides gritarle NO y premiarlo cuando se aleje de ella.",
-            choices: {
-                correct: "Muy de acuerdo",
-                wrong: ["Muy en desacuerdo", "Hay que pegarle para que aprenda","No dejarle comida a la vista"]
-            }
-        },
-        {
-            question_string: "Las visitas al veterinario son al menos 1 vez por año ",
-            choices: {
-                correct: "Muy de acuerdo",
-                wrong: ["Muy en desacuerdo", "Con remedios caseros vasta", "Solo ir cuando esta enfermo"]
-            }
-        }
-    ];
 
 
     var score = 0;
@@ -486,8 +430,8 @@
     // A function that you can enact on an instance of a quiz object. This function is called add_question() and takes in a Question object which it will add to the questions field.
     Quiz.prototype.add_question = function (question) {
         // Randomly choose where to add question
-        //var index_to_add_question = Math.floor(Math.random() * this.questions.length);
-        var index_to_add_question = this.questions.length;
+        var index_to_add_question = Math.floor(Math.random() * this.questions.length);
+        //var index_to_add_question = this.questions.length;
         this.questions.splice(index_to_add_question--, 0, question);
     }
     Quiz.prototype.render = function (container) {
@@ -641,7 +585,7 @@
         });
     }
     var Question = function (count, question_string, correct_choice, wrong_choices) {
-        this.question_string = count + ". " + question_string;
+        this.question_string = question_string;
         this.choices = [];
         this.user_choice_index = null; // Index of the user's choice selection
 
@@ -722,6 +666,11 @@
 
     $(document).ready(function () {
 
+        var puntuacion = "@ViewBag.Puntaje";
+
+        if (puntuacion == "False") {
+            showModal("No es posible realizar nuevamente la evaluacion");
+        }
 
             changeColor();
             $('.mascota-box').hide();
@@ -731,6 +680,7 @@
             $('#result').hide();
 
             $('#perfil-form').on('submit', function (event) {
+                changeColor();
                 event.preventDefault();
                 $('.perfil-box').hide();
                 $('.mascota-box').show();
@@ -750,7 +700,7 @@
 
     $('#ddlTipoMascota').on('change', function () {
 
-
+  
         (async () => {
             const rawResponse = await fetch('@Url.Action("GetRespuestasPreguntas", "Evaluacion")', {
                 method: 'POST',
@@ -759,39 +709,30 @@
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ SelectValuePerfil: $("#ddlPerfil").val(), SelectValueTipoMascota: $("#ddlTipoMascota").val() })
-            }).then((response) => {
-                return response.json().then((data) => {
-                    console.log(data);
-                    return data;
-                }).catch((err) => {
-                    console.log(err);
-                })
+            });
+                
+            const all_questions = await rawResponse.json();
+
+            $('#name-input-box').css('border-bottom', 'solid thin ' + myColor);
+            var quiz = new Quiz('My Quiz');
+            for (var i = 0; i < all_questions.length; i++) {
+                var question = new Question((i + 1), all_questions[i].question, all_questions[i].choices.correct, all_questions[i].choices.wrong);
+
+                // Add the question to the instance of the Quiz object that we created previously
+                quiz.add_question(question);
+            }
+            //Render the quiz
+            var quiz_container = $('#question-box');
+
+
+            $('#mascota-form').on('submit', function (event) {
+                event.preventDefault();
+                $('.mascota-box').hide();
+                quiz.render(quiz_container);
+                $('.navigation-buttons').show();
             });
 
         })();
-
-        var all_questions = '@TempData["JsonPreguntas"]';
-
-     
-
-        $('#name-input-box').css('border-bottom', 'solid thin ' + myColor);
-        var quiz = new Quiz('My Quiz');
-        for (var i = 0; i < all_questions.length; i++) {
-            var question = new Question((i + 1), all_questions[i].question, all_questions[i].choices.correct, all_questions[i].choices.wrong);
-
-            // Add the question to the instance of the Quiz object that we created previously
-            quiz.add_question(question);
-        }
-        //Render the quiz
-        var quiz_container = $('#question-box');
-
-
-        $('#mascota-form').on('submit', function (event) {
-            event.preventDefault();
-            $('.mascota-box').hide();
-            quiz.render(quiz_container);
-            $('.navigation-buttons').show();
-        });
 
     });
 

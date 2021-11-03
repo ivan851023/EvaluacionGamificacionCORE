@@ -56,9 +56,13 @@ namespace EvaluacionGamificacionCORE.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            //var puntuacion = _puntuacion.GetPuntuaciones().Where(x => x.IdUsuario == Convert.ToInt32(HttpContext.User.Claims.Select(x => x.Value))).FirstOrDefault();
 
-            //ViewBag.Puntaje = (puntuacion == 0 ? true : false);
+            var idUsuario = int.Parse(HttpContext.User.Claims.Select(x => x.Value).FirstOrDefault());
+
+
+            var puntuacion = _puntuacion.GetPuntuaciones().Where(x => x.IdUsuario == idUsuario).Count();
+
+            ViewBag.Puntaje = (puntuacion == 0 ? true : false);
             
             EvaluacionModel model = new EvaluacionModel();
             model.lstPerfiles = GetPerfiles();
@@ -170,6 +174,7 @@ namespace EvaluacionGamificacionCORE.Controllers
         public IEnumerable<VwPuntuacion> LoadGridCertificados()
         {
             IEnumerable<VwPuntuacion> result = _vwpuntuacion.GetDetallePuntuaciones().OrderByDescending(p => p.Id);
+            var idUsuario = int.Parse(HttpContext.User.Claims.Select(x => x.Value).FirstOrDefault());
             var listGrid = (from x in result
                             select new VwPuntuacion
                             {
@@ -177,10 +182,11 @@ namespace EvaluacionGamificacionCORE.Controllers
                                 Id = x.Id,
                                 Documento = x.Documento,
                                 FechaCreacion = x.FechaCreacion,
-                                Puntaje = x.Puntaje
+                                Puntaje = x.Puntaje,
+                                IdUsuario = x.IdUsuario
 
 
-                            }).Where(x => x.Puntaje >= 80).AsEnumerable();
+                            }).Where(x => x.Puntaje >= 80 && x.IdUsuario == idUsuario).AsEnumerable();
 
             return listGrid;
         }
@@ -378,11 +384,16 @@ namespace EvaluacionGamificacionCORE.Controllers
         }
 
         [HttpPost]
-        public JsonResult GetRespuestasPreguntas([FromBody] EvaluacionModel model)
+        public IActionResult GetRespuestasPreguntas([FromBody] EvaluacionModel model)
         {
 
             var preguntas = _preguntas.GetPreguntas().Where(x => x.IdPerfil == Convert.ToInt32(model.SelectValuePerfil)
             && x.IdTipoMascota == Convert.ToInt32(model.SelectValueTipoMascota));
+
+            if (preguntas.Count() == 0)
+            {
+                return RedirectToAction("Index", "Evaluacion");
+            }
 
             var respuestas = _respuestas.GetRespuestas().Where(y => preguntas.Contains(y.Preguntas));
 
@@ -418,11 +429,8 @@ namespace EvaluacionGamificacionCORE.Controllers
 
             var json = JsonSerializer.Serialize(lstQuestions);
 
-            TempData["JsonPreguntas"] = json;
-
+            
             return Json(lstQuestions);
-
         }
-
     }
 }
